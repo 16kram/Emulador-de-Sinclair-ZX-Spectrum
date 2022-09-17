@@ -126,6 +126,7 @@ public class Cargar {
             System.exit(0);
         } catch (NullPointerException e) {
             //vp.setTitle(Spectrum.TITULO_EMULADOR);
+            System.out.println("Error "+e);
         }
         int posDato;
         int posBuffer = 0;
@@ -143,6 +144,7 @@ public class Cargar {
                 posBuffer++;
             } while (posBuffer < finalDatos);
             bloque.add(bloqueDatos);
+            System.out.println("longitud datos="+longitudDatos);
         }
     }
 

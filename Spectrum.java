@@ -214,7 +214,7 @@ public class Spectrum extends JFrame implements ActionListener {
                 LeeTeclas.KROW7 = -65;
                 LeeTeclas.KROW6 &= (byte) 190; //ENTER
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(50);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Spectrum.class.getName()).log(Level.SEVERE, null, ex);
                 }

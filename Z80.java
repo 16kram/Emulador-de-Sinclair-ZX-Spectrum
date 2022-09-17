@@ -151,7 +151,7 @@ public class Z80 {
                     decDE();
                     contDatos++;
                 }
-                System.out.println("Longitud del bloque=" + longitudBloque);
+                //System.out.println("Longitud del bloque=" + longitudBloque);
                 cargar.IncNumBloqueActual();
             }
             setPc(0x05e2);
@@ -168,7 +168,7 @@ public class Z80 {
             case 0x01:
                 tStates += 10;
                 escribeC(Memoria.lee(pc));// C=Registro menor peso (7..0)
-                pc++;
+                incPC();
                 escribeB(Memoria.lee(pc));// B=Registro mayor peso (15..8)
                 incPC();
                 break;
@@ -196,7 +196,7 @@ public class Z80 {
             case 0x06:
                 tStates += 7;
                 escribeB(Memoria.lee(pc));
-                pc++;
+                incPC();
                 break;
             // RLCA
             case 0x07:
@@ -239,7 +239,7 @@ public class Z80 {
             case 0x0E:
                 tStates += 7;
                 escribeC(Memoria.lee(pc));
-                pc++;
+                incPC();
                 break;
             // RRCA
             case 0x0F:
@@ -256,16 +256,16 @@ public class Z80 {
                     jr();
                 } else {
                     tStates += 8;
-                    pc++;// Si no se cumple la condición ignora el byte de salto
+                    incPC();// Si no se cumple la condición ignora el byte de salto
                 }
                 break;
             // LD DE,HHLL
             case 0x11:
                 tStates += 10;
                 escribeE(Memoria.lee(pc));// E=Registro menor peso (7..0)
-                pc++;
+                incPC();
                 escribeD(Memoria.lee(pc));// D=Registro mayor peso (15..8)
-                pc++;
+                incPC();
                 break;
             // LD (DE),A
             case 0x12:
@@ -291,7 +291,7 @@ public class Z80 {
             case 0x16:
                 tStates += 7;
                 escribeD(Memoria.lee(pc));
-                pc++;
+                incPC();
                 break;
             // RLA
             case 0x17:
@@ -331,7 +331,7 @@ public class Z80 {
             case 0x1E:
                 tStates += 7;
                 escribeE(Memoria.lee(pc));
-                pc++;
+                incPC();
                 break;
             // RRA
             case 0x1F:
@@ -344,27 +344,27 @@ public class Z80 {
                     jr();
                 } else {
                     tStates += 7;
-                    pc++;
+                    incPC();
                 }
                 break;
             // LD HL,HHLL
             case 0x21:
                 tStates += 10;
                 escribeL(Memoria.lee(pc));// L=Registro menor peso (7..0)
-                pc++;
+                incPC();
                 escribeH(Memoria.lee(pc));// H=Registro mayor peso (15..8)
-                pc++;
+                incPC();
                 break;
             // LD (HHLL),HL
             case 0x22:
                 tStates += 16;
                 int regLL = (Memoria.lee(pc));// LL=Registro menor peso (7..0)
-                pc++;
+                incPC();
                 int regHH = (Memoria.lee(pc));// HH=Registro mayor peso (15..8)
-                pc++;
+                incPC();
                 int direccion = (regHH * 256) + regLL;
                 Memoria.escribe(direccion, leeL());
-                Memoria.escribe(direccion + 1, leeH());
+                Memoria.escribe((direccion + 1) & 0xffff, leeH());
                 break;
             // INC HL
             case 0x23:
@@ -385,7 +385,7 @@ public class Z80 {
             case 0x26:
                 tStates += 7;
                 escribeH(Memoria.lee(pc));
-                pc++;
+                incPC();
                 break;
             // DAA
             case 0x27:
@@ -398,7 +398,7 @@ public class Z80 {
                     jr();
                 } else {
                     tStates += 7;
-                    pc++;
+                    incPC();
                 }
                 break;
             // ADD HL,HL
@@ -410,12 +410,12 @@ public class Z80 {
             case 0x2A:
                 tStates += 16;
                 regLL = Memoria.lee(pc);
-                pc++;
+                incPC();
                 regHH = Memoria.lee(pc);
-                pc++;
+                incPC();
                 direccion = (regHH * 256) + regLL;
                 escribeL(Memoria.lee(direccion));
-                escribeH(Memoria.lee(direccion + 1));
+                escribeH(Memoria.lee((direccion + 1) & 0xffff));
                 break;
             // DEC HL
             case 0x2B:
@@ -436,7 +436,7 @@ public class Z80 {
             case 0x2E:
                 tStates += 7;
                 escribeL(Memoria.lee(pc));
-                pc++;
+                incPC();
                 break;
             // CPL
             case 0x2F:
@@ -449,24 +449,24 @@ public class Z80 {
                     jr();
                 } else {
                     tStates += 7;
-                    pc++;
+                    incPC();
                 }
                 break;
             // LD SP,HHLL
             case 0x31:
                 tStates += 10;
                 escribeP(Memoria.lee(pc));// P=Registro menor peso (7..0)
-                pc++;
+                incPC();
                 escribeS(Memoria.lee(pc));// S=Registro mayor peso (15..8)
-                pc++;
+                incPC();
                 break;
             // LD (HHLL),A
             case 0x32:
                 tStates += 13;
                 int byteL = Memoria.lee(pc);
-                pc++;
+                incPC();
                 int byteH = Memoria.lee(pc);
-                pc++;
+                incPC();
                 direccion = (byteH * 256) + byteL;
                 Memoria.escribe(direccion, leeA());
                 break;
@@ -490,7 +490,7 @@ public class Z80 {
                 tStates += 10;
                 int dato = Memoria.lee(pc);
                 Memoria.escribe(hl, dato);
-                pc++;
+                incPC();
                 break;
             // SCF
             case 0x37:
@@ -503,7 +503,7 @@ public class Z80 {
                     jr();
                 } else {
                     tStates += 7;
-                    pc++;
+                    incPC();
                 }
                 break;
             // ADD HL,SP
@@ -515,9 +515,9 @@ public class Z80 {
             case 0x3A:
                 tStates += 13;
                 byteL = Memoria.lee(pc);
-                pc++;
+                incPC();
                 byteH = Memoria.lee(pc);
-                pc++;
+                incPC();
                 direccion = (byteH * 256) + byteL;
                 escribeA(Memoria.lee(direccion));
                 break;
@@ -541,7 +541,7 @@ public class Z80 {
                 tStates += 7;
                 dato = Memoria.lee(pc);
                 escribeA(dato);
-                pc++;
+                incPC();
                 break;
             // CCF
             case 0x3F:
@@ -1203,23 +1203,23 @@ public class Z80 {
                 tStates += 10;
                 if (!getFlagZ()) {
                     byteL = Memoria.lee(pc);
-                    pc++;
+                    incPC();
                     byteH = Memoria.lee(pc);
-                    pc++;
+                    incPC();
                     direccion = (byteH * 256) + byteL;
                     pc = direccion;
                 } else {
-                    pc++;
-                    pc++;
+                    incPC();
+                    incPC();
                 }
                 break;
             // JP HHLL
             case 0xC3:
                 tStates += 10;
                 byteL = Memoria.lee(pc);
-                pc++;
+                incPC();
                 byteH = Memoria.lee(pc);
-                pc++;
+                incPC();
                 direccion = (byteH * 256) + byteL;
                 pc = direccion;
                 break;
@@ -1230,8 +1230,8 @@ public class Z80 {
                     call();
                 } else {
                     tStates += 10;
-                    pc++;
-                    pc++;
+                    incPC();
+                    incPC();
                 }
                 break;
             // PUSH BC
@@ -1246,7 +1246,7 @@ public class Z80 {
             case 0xC6:
                 tStates += 7;
                 addAnn();
-                pc++;
+                incPC();
                 break;
             // RST 00
             case 0xC7:
@@ -1272,14 +1272,14 @@ public class Z80 {
                 tStates += 10;
                 if (getFlagZ()) {
                     byteL = Memoria.lee(pc);
-                    pc++;
+                    incPC();
                     byteH = Memoria.lee(pc);
-                    pc++;
+                    incPC();
                     direccion = (byteH * 256) + byteL;
                     pc = direccion;
                 } else {
-                    pc++;
-                    pc++;
+                    incPC();
+                    incPC();
                 }
                 break;
             // Cb Opcodes
@@ -1293,8 +1293,8 @@ public class Z80 {
                     call();
                 } else {
                     tStates += 10;
-                    pc++;
-                    pc++;
+                    incPC();
+                    incPC();
                 }
                 break;
             // CALL HHLL
@@ -1306,7 +1306,7 @@ public class Z80 {
             case 0xCE:
                 tStates += 7;
                 adcAnn();
-                pc++;
+                incPC();
                 break;
             // RST 08
             case 0xCF:
@@ -1335,14 +1335,14 @@ public class Z80 {
                 tStates += 10;
                 if (!getFlagC()) {
                     byteL = Memoria.lee(pc);
-                    pc++;
+                    incPC();
                     byteH = Memoria.lee(pc);
-                    pc++;
+                    incPC();
                     direccion = (byteH * 256) + byteL;
                     pc = direccion;
                 } else {
-                    pc++;
-                    pc++;
+                    incPC();
+                    incPC();
                 }
                 break;
             // OUT (NN),A
@@ -1357,8 +1357,8 @@ public class Z80 {
                     call();
                 } else {
                     tStates += 10;
-                    pc++;
-                    pc++;
+                    incPC();
+                    incPC();
                 }
                 break;
             // PUSH DE
@@ -1373,7 +1373,7 @@ public class Z80 {
             case 0xD6:
                 tStates += 7;
                 subAnn();
-                pc++;
+                incPC();
                 break;
             // RST 10
             case 0xD7:
@@ -1407,14 +1407,14 @@ public class Z80 {
                 tStates += 10;
                 if (getFlagC()) {
                     byteL = Memoria.lee(pc);
-                    pc++;
+                    incPC();
                     byteH = Memoria.lee(pc);
-                    pc++;
+                    incPC();
                     direccion = (byteH * 256) + byteL;
                     pc = direccion;
                 } else {
-                    pc++;
-                    pc++;
+                    incPC();
+                    incPC();
                 }
                 break;
             // IN A,(NN)
@@ -1429,8 +1429,8 @@ public class Z80 {
                     call();
                 } else {
                     tStates += 10;
-                    pc++;
-                    pc++;
+                    incPC();
+                    incPC();
                 }
                 break;
             // DD Opcodes
@@ -1441,7 +1441,7 @@ public class Z80 {
             case 0xDE:
                 tStates += 7;
                 sbcAnn();
-                pc++;
+                incPC();
                 break;
             // RST 18
             case 0xDF:
@@ -1470,14 +1470,14 @@ public class Z80 {
                 tStates += 10;
                 if (!getFlagPV()) {
                     byteL = Memoria.lee(pc);
-                    pc++;
+                    incPC();
                     byteH = Memoria.lee(pc);
-                    pc++;
+                    incPC();
                     direccion = (byteH * 256) + byteL;
                     pc = direccion;
                 } else {
-                    pc++;
-                    pc++;
+                    incPC();
+                    incPC();
                 }
                 break;
             // EX (SP),HL
@@ -1486,9 +1486,9 @@ public class Z80 {
                 int l = leeL();
                 int h = leeH();
                 int p = Memoria.lee(sp);
-                int s = Memoria.lee(sp + 1);
+                int s = Memoria.lee((sp + 1) & 0xffff);
                 Memoria.escribe(sp, l);
-                Memoria.escribe(sp + 1, h);
+                Memoria.escribe((sp + 1) & 0xffff, h);
                 escribeL(p);
                 escribeH(s);
                 break;
@@ -1499,8 +1499,8 @@ public class Z80 {
                     call();
                 } else {
                     tStates += 10;
-                    pc++;
-                    pc++;
+                    incPC();
+                    incPC();
                 }
                 break;
             // PUSH HL
@@ -1515,7 +1515,7 @@ public class Z80 {
             case 0xE6:
                 tStates += 7;
                 andNn();
-                pc++;
+                incPC();
                 break;
             // RST 20
             case 0xE7:
@@ -1541,14 +1541,14 @@ public class Z80 {
                 tStates += 10;
                 if (getFlagPV()) {
                     byteL = Memoria.lee(pc);
-                    pc++;
+                    incPC();
                     byteH = Memoria.lee(pc);
-                    pc++;
+                    incPC();
                     direccion = (byteH * 256) + byteL;
                     pc = direccion;
                 } else {
-                    pc++;
-                    pc++;
+                    incPC();
+                    incPC();
                 }
                 break;
             // EX DE,HL
@@ -1565,8 +1565,8 @@ public class Z80 {
                     call();
                 } else {
                     tStates += 10;
-                    pc++;
-                    pc++;
+                    incPC();
+                    incPC();
                 }
                 break;
             // ED Opcodes
@@ -1577,7 +1577,7 @@ public class Z80 {
             case 0xEE:
                 tStates += 7;
                 xorNn();
-                pc++;
+                incPC();
                 break;
             // RST 28
             case 0xEF:
@@ -1606,14 +1606,14 @@ public class Z80 {
                 tStates += 10;
                 if (!getFlagS()) {
                     byteL = Memoria.lee(pc);
-                    pc++;
+                    incPC();
                     byteH = Memoria.lee(pc);
-                    pc++;
+                    incPC();
                     direccion = (byteH * 256) + byteL;
                     pc = direccion;
                 } else {
-                    pc++;
-                    pc++;
+                    incPC();
+                    incPC();
                 }
                 break;
             // DI
@@ -1628,8 +1628,8 @@ public class Z80 {
                     call();
                 } else {
                     tStates += 10;
-                    pc++;
-                    pc++;
+                    incPC();
+                    incPC();
                 }
                 break;
             // PUSH AF
@@ -1644,7 +1644,7 @@ public class Z80 {
             case 0xF6:
                 tStates += 7;
                 orNn();
-                pc++;
+                incPC();
                 break;
             // RST 30
             case 0xF7:
@@ -1670,14 +1670,14 @@ public class Z80 {
                 tStates += 10;
                 if (getFlagS()) {
                     byteL = Memoria.lee(pc);
-                    pc++;
+                    incPC();
                     byteH = Memoria.lee(pc);
-                    pc++;
+                    incPC();
                     direccion = (byteH * 256) + byteL;
                     pc = direccion;
                 } else {
-                    pc++;
-                    pc++;
+                    incPC();
+                    incPC();
                 }
                 break;
             // EI
@@ -1692,8 +1692,8 @@ public class Z80 {
                     call();
                 } else {
                     tStates += 10;
-                    pc++;
-                    pc++;
+                    incPC();
+                    incPC();
                 }
                 break;
             // FD Opcodes
@@ -1704,7 +1704,7 @@ public class Z80 {
             case 0xFE:
                 tStates += 7;
                 cpNn();
-                pc++;
+                incPC();
                 break;
             // RST 38
             case 0xFF:
@@ -3023,7 +3023,7 @@ public class Z80 {
             case 0x06:
                 tStates += 7;
                 escribeB(Memoria.lee(pc));
-                pc++;
+                incPC();
                 break;
             // ADD IX,BC
             case 0x09:
@@ -3044,7 +3044,7 @@ public class Z80 {
             case 0x0E:
                 tStates += 7;
                 escribeC(Memoria.lee(pc));
-                pc++;
+                incPC();
                 break;
             //INC D
             case 0x14:
@@ -3060,7 +3060,7 @@ public class Z80 {
             case 0x16:
                 tStates += 7;
                 escribeD(Memoria.lee(pc));
-                pc++;
+                incPC();
             // ADD IX,DE
             case 0x19:
                 tStates += 15;
@@ -3080,26 +3080,26 @@ public class Z80 {
             case 0x1E:
                 tStates += 7;
                 escribeE(Memoria.lee(pc));
-                pc++;
+                incPC();
                 break;
             // LD IX,HHLL
             case 0x21:
                 tStates += 14;
                 escribeIxL(Memoria.lee(pc));// L=Registro menor peso (7..0)
-                pc++;
+                incPC();
                 escribeIxH(Memoria.lee(pc));// H=Registro mayor peso (15..8)
-                pc++;
+                incPC();
                 break;
             // LD (HHLL),IX
             case 0x22:
                 tStates += 20;
                 int regLL = (Memoria.lee(pc));// LL=Registro menor peso (7..0)
-                pc++;
+                incPC();
                 int regHH = (Memoria.lee(pc));// HH=Registro mayor peso (15..8)
-                pc++;
+                incPC();
                 int direccion = (regHH * 256) + regLL;
                 Memoria.escribe(direccion, leeIxL());
-                Memoria.escribe(direccion + 1, leeIxH());
+                Memoria.escribe((direccion + 1) & 0xffff, leeIxH());
                 break;
             // INC IX
             case 0x23:
@@ -3120,7 +3120,7 @@ public class Z80 {
             case 0x26:
                 tStates += 11;
                 regLL = Memoria.lee(pc);
-                pc++;
+                incPC();
                 escribeIxH(regLL);
                 break;
             // ADD IX,IX
@@ -3132,12 +3132,12 @@ public class Z80 {
             case 0x2A:
                 tStates += 20;
                 regLL = Memoria.lee(pc);
-                pc++;
+                incPC();
                 regHH = Memoria.lee(pc);
-                pc++;
+                incPC();
                 direccion = (regHH * 256) + regLL;
                 escribeIxL(Memoria.lee(direccion));
-                escribeIxH(Memoria.lee(direccion + 1));
+                escribeIxH(Memoria.lee((direccion + 1) & 0xffff));
                 break;
             // DEC IX
             case 0x2B:
@@ -3158,7 +3158,7 @@ public class Z80 {
             case 0x2E:
                 tStates += 11;
                 regLL = Memoria.lee(pc);
-                pc++;
+                incPC();
                 escribeIxL(regLL);
                 break;
             // INC (IX+NN)
@@ -3175,10 +3175,10 @@ public class Z80 {
             case 0x36:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 int dato = Memoria.lee(pc);
                 Memoria.escribe((ix + (byte) desplazamiento) & 0xffff, dato);
-                pc++;
+                incPC();
                 break;
             // ADD IX,SP
             case 0x39:
@@ -3200,7 +3200,7 @@ public class Z80 {
                 tStates += 7;
                 dato = Memoria.lee(pc);
                 escribeA(dato);
-                pc++;
+                incPC();
                 break;
             // LD B,B
             case 0x40:
@@ -3235,7 +3235,7 @@ public class Z80 {
             case 0x46:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 escribeB(Memoria.lee((ix + (byte) desplazamiento) & 0xffff));
                 break;
             // LD B,A
@@ -3276,7 +3276,7 @@ public class Z80 {
             case 0x4E:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 escribeC(Memoria.lee((ix + (byte) desplazamiento) & 0xffff));
                 break;
             // LD C,A
@@ -3317,7 +3317,7 @@ public class Z80 {
             case 0x56:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 escribeD(Memoria.lee((ix + (byte) desplazamiento) & 0xffff));
                 break;
             // LD D,A
@@ -3358,7 +3358,7 @@ public class Z80 {
             case 0x5E:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 escribeE(Memoria.lee((ix + (byte) desplazamiento) & 0xffff));
                 break;
             // LD E,A
@@ -3399,7 +3399,7 @@ public class Z80 {
             case 0x66:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 escribeH(Memoria.lee((ix + (byte) desplazamiento) & 0xffff));
                 break;
             //LD IXH,A
@@ -3440,7 +3440,7 @@ public class Z80 {
             case 0x6E:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 escribeL(Memoria.lee((ix + (byte) desplazamiento) & 0xffff));
                 break;
             //LD IXL,A  
@@ -3452,49 +3452,49 @@ public class Z80 {
             case 0x70:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 Memoria.escribe((ix + (byte) desplazamiento) & 0xffff, leeB());
                 break;
             // LD (IX+NN),C
             case 0x71:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 Memoria.escribe((ix + (byte) desplazamiento) & 0xffff, leeC());
                 break;
             // LD (IX+NN),D
             case 0x72:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 Memoria.escribe((ix + (byte) desplazamiento) & 0xffff, leeD());
                 break;
             // LD (IX+NN),E
             case 0x73:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 Memoria.escribe((ix + (byte) desplazamiento) & 0xffff, leeE());
                 break;
             // LD (IX+NN),H
             case 0x74:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 Memoria.escribe((ix + (byte) desplazamiento) & 0xffff, leeH());
                 break;
             // LD (IX+NN),L
             case 0x75:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 Memoria.escribe((ix + (byte) desplazamiento) & 0xffff, leeL());
                 break;
             // LD (IX+NN),A
             case 0x77:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 Memoria.escribe((ix + (byte) desplazamiento) & 0xffff, leeA());
                 break;
             // LD A,B
@@ -3531,7 +3531,7 @@ public class Z80 {
             case 0x7E:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 escribeA(Memoria.lee((ix + (byte) desplazamiento) & 0xffff));
                 break;
             // LD A,A
@@ -3861,7 +3861,7 @@ public class Z80 {
             //DDCB Opcodes
             case 0xCB:
                 desp = Memoria.lee(pc);
-                pc++;
+                incPC();
                 ddCbOpcodes();
                 break;
             // POP IX
@@ -3878,9 +3878,9 @@ public class Z80 {
                 int ixl = leeIxL();
                 int ixh = leeIxH();
                 int p = Memoria.lee(sp);
-                int s = Memoria.lee(sp + 1);
+                int s = Memoria.lee((sp + 1) & 0xffff);
                 Memoria.escribe(sp, ixl);
-                Memoria.escribe(sp + 1, ixh);
+                Memoria.escribe((sp + 1) & 0xffff, ixh);
                 escribeIxL(p);
                 escribeIxH(s);
                 break;
@@ -4343,7 +4343,7 @@ public class Z80 {
             case 0x06:
                 tStates += 7;
                 escribeB(Memoria.lee(pc));
-                pc++;
+                incPC();
                 break;
             // ADD IY,BC
             case 0x09:
@@ -4364,7 +4364,7 @@ public class Z80 {
             case 0x0E:
                 tStates += 7;
                 escribeC(Memoria.lee(pc));
-                pc++;
+                incPC();
                 break;
             //INC D
             case 0x14:
@@ -4380,7 +4380,7 @@ public class Z80 {
             case 0x16:
                 tStates += 7;
                 escribeD(Memoria.lee(pc));
-                pc++;
+                incPC();
             // ADD IY,DE
             case 0x19:
                 tStates += 15;
@@ -4400,26 +4400,26 @@ public class Z80 {
             case 0x1E:
                 tStates += 7;
                 escribeE(Memoria.lee(pc));
-                pc++;
+                incPC();
                 break;
             // LD IY,HHLL
             case 0x21:
                 tStates += 14;
                 escribeIyL(Memoria.lee(pc));// L=Registro menor peso (7..0)
-                pc++;
+                incPC();
                 escribeIyH(Memoria.lee(pc));// H=Registro mayor peso (15..8)
-                pc++;
+                incPC();
                 break;
             // LD (HHLL),IY
             case 0x22:
                 tStates += 20;
                 int regLL = (Memoria.lee(pc));// LL=Registro menor peso (7..0)
-                pc++;
+                incPC();
                 int regHH = (Memoria.lee(pc));// HH=Registro mayor peso (15..8)
-                pc++;
+                incPC();
                 int direccion = (regHH * 256) + regLL;
                 Memoria.escribe(direccion, leeIyL());
-                Memoria.escribe(direccion + 1, leeIyH());
+                Memoria.escribe((direccion + 1) & 0xffff, leeIyH());
                 break;
             // INC IY
             case 0x23:
@@ -4440,7 +4440,7 @@ public class Z80 {
             case 0x26:
                 tStates += 11;
                 regLL = Memoria.lee(pc);
-                pc++;
+                incPC();
                 escribeIyH(regLL);
                 break;
             // ADD IY,IY
@@ -4452,12 +4452,12 @@ public class Z80 {
             case 0x2A:
                 tStates += 20;
                 regLL = Memoria.lee(pc);
-                pc++;
+                incPC();
                 regHH = Memoria.lee(pc);
-                pc++;
+                incPC();
                 direccion = (regHH * 256) + regLL;
                 escribeIyL(Memoria.lee(direccion));
-                escribeIyH(Memoria.lee(direccion + 1));
+                escribeIyH(Memoria.lee((direccion + 1) & 0xffff));
                 break;
             // DEC IY
             case 0x2B:
@@ -4478,7 +4478,7 @@ public class Z80 {
             case 0x2E:
                 tStates += 11;
                 regLL = Memoria.lee(pc);
-                pc++;
+                incPC();
                 escribeIyL(regLL);
                 break;
             // INC (IY+NN)
@@ -4495,10 +4495,10 @@ public class Z80 {
             case 0x36:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 int dato = Memoria.lee(pc);
                 Memoria.escribe((iy + (byte) desplazamiento) & 0xffff, dato);
-                pc++;
+                incPC();
                 break;
             // ADD IY,SP
             case 0x39:
@@ -4520,7 +4520,7 @@ public class Z80 {
                 tStates += 7;
                 dato = Memoria.lee(pc);
                 escribeA(dato);
-                pc++;
+                incPC();
                 break;
             // LD B,B
             case 0x40:
@@ -4555,7 +4555,7 @@ public class Z80 {
             case 0x46:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 escribeB(Memoria.lee((iy + (byte) desplazamiento) & 0xffff));
                 break;
             // LD B,A
@@ -4596,8 +4596,8 @@ public class Z80 {
             case 0x4E:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
-                escribeC((Memoria.lee(iy + (byte) desplazamiento) & 0xffff));
+                incPC();
+                escribeC(Memoria.lee((iy + (byte) desplazamiento) & 0xffff));
                 break;
             // LD C,A
             case 0x4F:
@@ -4637,8 +4637,8 @@ public class Z80 {
             case 0x56:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
-                escribeD((Memoria.lee(iy + (byte) desplazamiento) & 0xffff));
+                incPC();
+                escribeD((Memoria.lee((iy + (byte) desplazamiento) & 0xffff)));
                 break;
             // LD D,A
             case 0x57:
@@ -4678,7 +4678,7 @@ public class Z80 {
             case 0x5E:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 escribeE(Memoria.lee((iy + (byte) desplazamiento) & 0xffff));
                 break;
             // LD E,A
@@ -4719,8 +4719,8 @@ public class Z80 {
             case 0x66:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
-                escribeH((Memoria.lee(iy + (byte) desplazamiento) & 0xffff));
+                incPC();
+                escribeH(Memoria.lee((iy + (byte) desplazamiento) & 0xffff));
                 break;
             //LD IYH,A
             case 0x67:
@@ -4760,8 +4760,8 @@ public class Z80 {
             case 0x6E:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
-                escribeL((Memoria.lee(iy + (byte) desplazamiento) & 0xffff));
+                incPC();
+                escribeL(Memoria.lee((iy + (byte) desplazamiento) & 0xffff));
                 break;
             //LD IYL,A  
             case 0x6F:
@@ -4772,49 +4772,49 @@ public class Z80 {
             case 0x70:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 Memoria.escribe((iy + (byte) desplazamiento) & 0xffff, leeB());
                 break;
             // LD (IY+NN),C
             case 0x71:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 Memoria.escribe((iy + (byte) desplazamiento) & 0xffff, leeC());
                 break;
             // LD (IY+NN),D
             case 0x72:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 Memoria.escribe((iy + (byte) desplazamiento) & 0xffff, leeD());
                 break;
             // LD (IY+NN),E
             case 0x73:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 Memoria.escribe((iy + (byte) desplazamiento) & 0xffff, leeE());
                 break;
             // LD (IY+NN),H
             case 0x74:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 Memoria.escribe((iy + (byte) desplazamiento) & 0xffff, leeH());
                 break;
             // LD (IY+NN),L
             case 0x75:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 Memoria.escribe((iy + (byte) desplazamiento) & 0xffff, leeL());
                 break;
             // LD (IY+NN),A
             case 0x77:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 Memoria.escribe((iy + (byte) desplazamiento) & 0xffff, leeA());
                 break;
             // LD A,B
@@ -4851,7 +4851,7 @@ public class Z80 {
             case 0x7E:
                 tStates += 19;
                 desplazamiento = Memoria.lee(pc);
-                pc++;
+                incPC();
                 escribeA(Memoria.lee((iy + (byte) desplazamiento) & 0xffff));
                 break;
             // LD A,A
@@ -5181,7 +5181,7 @@ public class Z80 {
             //FDCB Opcodes
             case 0xCB:
                 desp = Memoria.lee(pc);
-                pc++;
+                incPC();
                 fdCbOpcodes();
                 break;
             // POP IY
@@ -5198,9 +5198,9 @@ public class Z80 {
                 int iyl = leeIyL();
                 int iyh = leeIyH();
                 int p = Memoria.lee(sp);
-                int s = Memoria.lee(sp + 1);
+                int s = Memoria.lee((sp + 1) & 0xffff);
                 Memoria.escribe(sp, iyl);
-                Memoria.escribe(sp + 1, iyh);
+                Memoria.escribe((sp + 1) & 0xffff, iyh);
                 escribeIyL(p);
                 escribeIyH(s);
                 break;
@@ -6892,7 +6892,7 @@ public class Z80 {
     // Incrementa IX+d
     public void incIXd() {
         int d = Memoria.lee(pc);// Coge el valor de desplazamiento
-        pc++;
+        incPC();
         int puntero = (ix + (byte) d) & 0xffff;
         int valor = Memoria.lee(puntero);
         // Guarda el valor en valorMemo
@@ -6928,7 +6928,7 @@ public class Z80 {
     // Incrementa IY+d
     public void incIYd() {
         int d = Memoria.lee(pc);// Coge el valor de desplazamiento
-        pc++;
+        incPC();
         int puntero = (iy + (byte) d) & 0xffff;
         int valor = Memoria.lee(puntero);
         // Guarda el valor en valorMemo
@@ -6964,7 +6964,7 @@ public class Z80 {
     // Decrementa IX+d
     public void decIXd() {
         int d = Memoria.lee(pc);// Coge el valor de desplazamiento
-        pc++;
+        incPC();
         int puntero = (ix + (byte) d) & 0xffff;
         int valor = Memoria.lee(puntero);
         // Guarda el valor en valorMemo
@@ -7000,7 +7000,7 @@ public class Z80 {
     // Decrementa IY+d
     public void decIYd() {
         int d = Memoria.lee(pc);// Coge el valor de desplazamiento
-        pc++;
+        incPC();
         int puntero = (iy + (byte) d) & 0xffff;
         int valor = Memoria.lee(puntero);
         // Coge el valor del bit4 del registro
@@ -7326,7 +7326,7 @@ public class Z80 {
     // Suma el acumulador con la posición de memoria indexada
     public void addAIXd() {
         desplazamiento = Memoria.lee(pc);
-        pc++;
+        incPC();
         int dato = Memoria.lee((ix + (byte) desplazamiento) & 0xffff);
         sumaAFlags(dato, false);
     }
@@ -7334,7 +7334,7 @@ public class Z80 {
     // Suma el acumulador con la posición de memoria indexada
     public void addAIYd() {
         desplazamiento = Memoria.lee(pc);
-        pc++;
+        incPC();
         int dato = Memoria.lee((iy + (byte) desplazamiento) & 0xffff);
         sumaAFlags(dato, false);
     }
@@ -7342,7 +7342,7 @@ public class Z80 {
     // Suma el acumulador con la posición de memoria indexada
     public void adcAIXd() {
         desplazamiento = Memoria.lee(pc);
-        pc++;
+        incPC();
         int dato = Memoria.lee((ix + (byte) desplazamiento) & 0xffff);
         sumaAFlags(dato, true);
     }
@@ -7350,7 +7350,7 @@ public class Z80 {
     // Suma el acumulador con la posición de memoria indexada
     public void adcAIYd() {
         desplazamiento = Memoria.lee(pc);
-        pc++;
+        incPC();
         int dato = Memoria.lee((iy + (byte) desplazamiento) & 0xffff);
         sumaAFlags(dato, true);
     }
@@ -7653,7 +7653,7 @@ public class Z80 {
     // Resta el acumulador con la posición de memoria indexada
     public void subAIXd() {
         desplazamiento = Memoria.lee(pc);
-        pc++;
+        incPC();
         int dato = Memoria.lee((ix + (byte) desplazamiento) & 0xffff);
         restaAFlags(dato, false);
     }
@@ -7661,7 +7661,7 @@ public class Z80 {
     // Resta el acumulador con la posición de memoria indexada
     public void subAIYd() {
         desplazamiento = Memoria.lee(pc);
-        pc++;
+        incPC();
         int dato = Memoria.lee((iy + (byte) desplazamiento) & 0xffff);
         restaAFlags(dato, false);
     }
@@ -7669,7 +7669,7 @@ public class Z80 {
     // Resta el acumulador con la posición de memoria indexada
     public void sbcAIXd() {
         desplazamiento = Memoria.lee(pc);
-        pc++;
+        incPC();
         int dato = Memoria.lee((ix + (byte) desplazamiento) & 0xffff);
         restaAFlags(dato, true);
     }
@@ -7677,7 +7677,7 @@ public class Z80 {
     // Resta el acumulador con la posición de memoria indexada
     public void sbcAIYd() {
         desplazamiento = Memoria.lee(pc);
-        pc++;
+        incPC();
         int dato = Memoria.lee((iy + (byte) desplazamiento) & 0xffff);
         restaAFlags(dato, true);
     }
@@ -7767,12 +7767,12 @@ public class Z80 {
                 break;
             case IX:
                 indice = Memoria.lee(pc);
-                pc++;
+                incPC();
                 reg = Memoria.lee((ix + (byte) indice) & 0xffff);
                 break;
             case IY:
                 indice = Memoria.lee(pc);
-                pc++;
+                incPC();
                 reg = Memoria.lee((iy + (byte) indice) & 0xffff);
                 break;
             case IXH:
@@ -7804,6 +7804,7 @@ public class Z80 {
         setHFlag();
         ceroNFlag();
         ceroCFlag();
+        flagsXY(and);//Actualiza los Flags X e Y
     }
 
     // Hace and A con el contenido en memoria indicado por HL
@@ -7826,6 +7827,7 @@ public class Z80 {
         setHFlag();
         ceroNFlag();
         ceroCFlag();
+        flagsXY(and);//Actualiza los Flags X e Y
     }
 
     // Hace or A con un registro
@@ -7856,12 +7858,12 @@ public class Z80 {
                 break;
             case IX:
                 indice = Memoria.lee(pc);
-                pc++;
+                incPC();
                 reg = Memoria.lee((ix + (byte) indice) & 0xffff);
                 break;
             case IY:
                 indice = Memoria.lee(pc);
-                pc++;
+                incPC();
                 reg = Memoria.lee((iy + (byte) indice) & 0xffff);
                 break;
             case IXH:
@@ -7893,6 +7895,7 @@ public class Z80 {
         ceroHFlag();
         ceroNFlag();
         ceroCFlag();
+        flagsXY(or);//Actualiza los Flags X e Y
     }
 
     // Hace or A con el contenido en memoria indicado por HL
@@ -7915,6 +7918,7 @@ public class Z80 {
         ceroHFlag();
         ceroNFlag();
         ceroCFlag();
+        flagsXY(or);//Actualiza los Flags X e Y
     }
 
     // Hace or A con un dato
@@ -7937,6 +7941,7 @@ public class Z80 {
         ceroHFlag();
         ceroNFlag();
         ceroCFlag();
+        flagsXY(or);//Actualiza los Flags X e Y
     }
 
     // Hace xor A con un registro
@@ -7967,12 +7972,12 @@ public class Z80 {
                 break;
             case IX:
                 indice = Memoria.lee(pc);
-                pc++;
+                incPC();
                 reg = Memoria.lee((ix + (byte) indice) & 0xffff);
                 break;
             case IY:
                 indice = Memoria.lee(pc);
-                pc++;
+                incPC();
                 reg = Memoria.lee((iy + (byte) indice) & 0xffff);
                 break;
             case IXH:
@@ -8004,6 +8009,7 @@ public class Z80 {
         ceroHFlag();
         ceroNFlag();
         ceroCFlag();
+        flagsXY(xor);//Actualiza los Flags X e Y
     }
 
     // Hace xor A con el contenido en memoria indicado por HL
@@ -8026,6 +8032,7 @@ public class Z80 {
         ceroHFlag();
         ceroNFlag();
         ceroCFlag();
+        flagsXY(xor);//Actualiza los Flags X e Y
     }
 
     // Hace xor A con un dato
@@ -8048,6 +8055,7 @@ public class Z80 {
         ceroHFlag();
         ceroNFlag();
         ceroCFlag();
+        flagsXY(xor);//Actualiza los Flags X e Y
     }
 
     // Hace and A con un dato
@@ -8070,6 +8078,7 @@ public class Z80 {
         setHFlag();
         ceroNFlag();
         ceroCFlag();
+        flagsXY(and);//Actualiza los Flags X e Y
     }
 
     // Pone el flag de paridad P/V a 1 si el número de bits es par y a 0 si es impar
@@ -8118,12 +8127,12 @@ public class Z80 {
                 break;
             case IX:
                 indice = Memoria.lee(pc);
-                pc++;
+                incPC();
                 reg = Memoria.lee((ix + (byte) indice) & 0xffff);
                 break;
             case IY:
                 indice = Memoria.lee(pc);
-                pc++;
+                incPC();
                 reg = Memoria.lee((iy + (byte) indice) & 0xffff);
                 break;
             case IXH:
@@ -8159,9 +8168,9 @@ public class Z80 {
     // Call
     public void call() {
         int pcL = Memoria.lee(pc);
-        pc++;
+        incPC();
         int pcH = Memoria.lee(pc);
-        pc++;
+        incPC();
         decSp();
         Memoria.escribe(sp, leePC_H());
         decSp();
@@ -9241,7 +9250,7 @@ public class Z80 {
     // Carga el acumulador a partir del puerto indicado
     public void inAnn() {
         int puerto = Memoria.lee(pc);// Se carga el número de puerto
-        pc++;
+        incPC();
         escribeA0A7(puerto);
         escribeA8A15(leeA());
         //Direccionamiento teclado ZX-Spectrum
@@ -9287,12 +9296,15 @@ public class Z80 {
                 escribeA(0xff);
             }
         }
+        if (puerto == 31) {//Joystick Kempston
+            escribeA(LeeTeclas.kempston);
+        }
     }
 
     // Salida del acumulador al puerto indicado
     public void outNnA() {
         int puerto = Memoria.lee(pc);// Se carga el número de puerto
-        pc++;
+        incPC();
         escribeA0A7(puerto);
         escribeA8A15(leeA());
         escribeD0D7(leeA());// El contenido de A pasa a port
@@ -9361,6 +9373,9 @@ public class Z80 {
             } else {
                 reg = 0xff;
             }
+        }
+        if (leeC() == 31) {//Joystick Kempston
+            reg = LeeTeclas.kempston;
         }
         switch (registro) {
             case A:
@@ -9554,11 +9569,12 @@ public class Z80 {
         // Resta Reg de regA y modifica los flags
         regA = regA - reg;
         if (regA < 0) {
-            regA = regA + 256;
+            //regA = regA + 256;
             setCFlag();
         } else {
             ceroCFlag();
         }
+        regA = regA & 0xff;
         if (regA == 0) {// Flag CERO
             setZFlag();
         } else {
@@ -9587,26 +9603,26 @@ public class Z80 {
     // direccionadas por NN
     public void ldDDNN(int reg) {
         int regLL = Memoria.lee(pc);
-        pc++;
+        incPC();
         int regHH = Memoria.lee(pc);
-        pc++;
+        incPC();
         int direccion = (regHH * 256) + regLL;
         switch (reg) {
             case BC:
                 escribeC(Memoria.lee(direccion));
-                escribeB(Memoria.lee(direccion + 1));
+                escribeB(Memoria.lee((direccion + 1) & 0xffff));
                 break;
             case DE:
                 escribeE(Memoria.lee(direccion));
-                escribeD(Memoria.lee(direccion + 1));
+                escribeD(Memoria.lee((direccion + 1) & 0xffff));
                 break;
             case HL:
                 escribeL(Memoria.lee(direccion));
-                escribeH(Memoria.lee(direccion + 1));
+                escribeH(Memoria.lee((direccion + 1) & 0xffff));
                 break;
             case SP:
                 escribeP(Memoria.lee(direccion));
-                escribeS(Memoria.lee(direccion + 1));
+                escribeS(Memoria.lee((direccion + 1) & 0xffff));
                 break;
         }
     }
@@ -9615,26 +9631,26 @@ public class Z80 {
     // registros DD
     public void ldNNDD(int reg) {
         int regLL = Memoria.lee(pc);
-        pc++;
+        incPC();
         int regHH = Memoria.lee(pc);
-        pc++;
+        incPC();
         int direccion = (regHH * 256) + regLL;
         switch (reg) {
             case BC:
                 Memoria.escribe(direccion, leeC());
-                Memoria.escribe(direccion + 1, leeB());
+                Memoria.escribe((direccion + 1) & 0xffff, leeB());
                 break;
             case DE:
                 Memoria.escribe(direccion, leeE());
-                Memoria.escribe(direccion + 1, leeD());
+                Memoria.escribe((direccion + 1) & 0xffff, leeD());
                 break;
             case HL:
                 Memoria.escribe(direccion, leeL());
-                Memoria.escribe(direccion + 1, leeH());
+                Memoria.escribe((direccion + 1) & 0xffff, leeH());
                 break;
             case SP:
                 Memoria.escribe(direccion, leeP());
-                Memoria.escribe(direccion + 1, leeS());
+                Memoria.escribe((direccion + 1) & 0xffff, leeS());
                 break;
         }
     }
@@ -10288,7 +10304,9 @@ public class Z80 {
 
     // Incrementa el registro de refresco de memorias R
     public void incR() {
-        r = r + 1 & 0xff;
+        int rMemo = r;
+        r = r + 1 & 0x7f;//Cuenta de 0 a 127 sin alterar el bit número 7
+        r |= rMemo & 0x80;
     }
 
     //Actualiza los Flags X e Y
@@ -10350,7 +10368,7 @@ public class Z80 {
                 Memoria.escribe(sp, leePC_L());
                 int direccion = (leeI() * 256) + 255;
                 escribePC_L(Memoria.lee(direccion));
-                escribePC_H(Memoria.lee(direccion + 1));
+                escribePC_H(Memoria.lee((direccion + 1) & 0xffff));
                 tStates += 19;
             }
         }
