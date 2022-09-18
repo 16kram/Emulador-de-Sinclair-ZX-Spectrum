@@ -27,6 +27,7 @@ public class Pantalla extends JPanel {
 
     @Override
     public void paint(Graphics g) {
+        super.paint(g);//Elimina parpadeos en la pantalla con la llamada super.paint(g)
         ponBorde(g);
         actualiza(g);
     }

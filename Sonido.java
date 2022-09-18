@@ -85,7 +85,7 @@ public class Sonido extends Thread {
     }
 
     public void ajustaMuestra() {
-        while (posMuestra <3840) {
+        while (posMuestra < 3840) {
             guardaMuestra();
         }
     }
