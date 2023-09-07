@@ -3,7 +3,7 @@
 <p>Para probar el emulador descargar en el mismo directorio los archivos <b>Spectrum.jar</b>  y <b>spectrum.rom</b></p>
 <p>Luego ejecutar <b>Spectrum.jar</b><p>
 
-  [![Alt text](https://img.youtube.com/vi/5ZngYekz4-s/0.jpg)](https://www.youtube.com/watch?v=5ZngYekz4-s)
+  [![Alt text](https://img.youtube.com/vi/0KaNXCbtbks/0.jpg)](https://www.youtube.com/watch?v=0KaNXCbtbks)
 </br>
 </br>
 --------------------------------------------------------------
